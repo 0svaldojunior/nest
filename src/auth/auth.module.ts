@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config'
-import { Env } from 'src/env'
+import { Env } from '@/env'
 import { JwtModule } from '@nestjs/jwt'
 import { JwtStrategy } from './jwt.strategy'
 import { Module } from '@nestjs/common'
