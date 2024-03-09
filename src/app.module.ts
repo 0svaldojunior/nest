@@ -3,6 +3,7 @@ import { AuthenticateController } from './controllers/authenticate.controller'
 import { ConfigModule } from '@nestjs/config'
 import { CreateAccountController } from './controllers/create-account.controller'
 import { CreateQuestionController } from './controllers/create-question.controller'
+import { FetchRecentQuestionsController } from './controllers/fetch-recent-questions.controller'
 import { Module } from '@nestjs/common'
 import { PrismaService } from './prisma/prisma.service'
 import { envSchema } from './env'
@@ -19,6 +20,7 @@ import { envSchema } from './env'
     CreateAccountController,
     AuthenticateController,
     CreateQuestionController,
+    FetchRecentQuestionsController,
   ],
   providers: [PrismaService],
 })
