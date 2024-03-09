@@ -1,7 +1,8 @@
 // Plugin REST Client for Visual Studio Code
 @baseURL = http://localhost:3333
+@authToken = {{authenticate.response.body.access_token}}
 
-#@name create_account
+# @name create_account
 POST {{baseURL}}/accounts
 Content-Type: application/json
 
@@ -13,7 +14,7 @@ Content-Type: application/json
 
 ###
 
-#@name authenticate
+# @name authenticate
 POST {{baseURL}}/sessions
 Content-Type: application/json
 
@@ -21,3 +22,10 @@ Content-Type: application/json
   "email": "o.r.jr@hotmail.com",
   "password": "123456"
 }
+
+###
+
+# @name create_question
+POST {{baseURL}}/questions
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
