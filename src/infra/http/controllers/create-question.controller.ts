@@ -1,11 +1,16 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common'
-import { CurrentUser } from '@/auth/current-user-decorator'
-
-import { JwtAuthGuard } from '@/auth/jwt-auth.guard'
-import { UserPayload } from '@/auth/jwt.strategy'
-import { ZodValidationPipe } from '@/pipes/zod-validation-pipe'
-import { PrismaService } from '@/prisma/prisma.service'
+import {
+  Body,
+  ConflictException,
+  Controller,
+  Post,
+  UseGuards,
+} from '@nestjs/common'
 import { z } from 'zod'
+import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
+import { JwtAuthGuard } from '@/infra/auth/jwt-auth.guard'
+import { PrismaService } from '@/infra/prisma/prisma.service'
+import { CurrentUser } from '@/infra/auth/current-user-decorator'
+import { UserPayload } from '@/infra/auth/jwt.strategy'
 
 const createQuestionBodySchema = z.object({
   title: z.string(),
@@ -30,6 +35,16 @@ export class CreateQuestionController {
     const userId = user.sub
 
     const slug = this.convertToSlug(title)
+
+    const questionWithSameSlug = await this.prisma.question.findUnique({
+      where: {
+        slug,
+      },
+    })
+
+    if (questionWithSameSlug) {
+      throw new ConflictException('Question with same slug already exists')
+    }
 
     await this.prisma.question.create({
       data: {
