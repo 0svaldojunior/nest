@@ -38,7 +38,7 @@ Authorization: Bearer {{authToken}}
 ###
 # @description page on query params is optional
 # @name fetch_recent_questions
-GET {{baseURL}}/questions?page=3
+GET {{baseURL}}/questions?page=1
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
