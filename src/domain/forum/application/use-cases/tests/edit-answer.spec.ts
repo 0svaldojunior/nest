@@ -1,7 +1,7 @@
 import { EditAnswerUseCase } from '../edit-answer'
 import { InMemoryAnswerRepository } from 'test/repositories/in-memory-answer-repository'
 import { InMemoryAnswersAttachmentsRepository } from 'test/repositories/in-memory-answer-attachment-repository'
-import { NotAllowedError } from '@/core/errors/not-allowed-error'
+import { NotAllowedError } from '@/core/errors/not-allowed.error'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { makeAnswer } from 'test/factories/make-answer'
 import { makeAnswerAttachment } from 'test/factories/make-answer-attachment'

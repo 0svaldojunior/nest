@@ -3,7 +3,7 @@ import { Either, error, success } from '@/core/either'
 import { QuestionComment } from '../../enterprise/entities/question-comments'
 import { QuestionCommentsRepository } from '../repositories/question-comments-repository'
 import { QuestionRepository } from '../repositories/question-repository'
-import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found.error'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 interface CommentOnQuestionUseCaseRequest {
