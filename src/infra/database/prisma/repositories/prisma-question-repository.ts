@@ -1,12 +1,24 @@
 import { Injectable } from '@nestjs/common'
 import { PaginationParams } from '@/core/repositories/pagination-params'
+import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper'
+import { PrismaService } from '../prisma.service'
 import { Question } from '@/domain/forum/enterprise/entities/question'
 import { QuestionRepository } from '@/domain/forum/application/repositories/question-repository'
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionRepository {
-  findById(id: string): Promise<Question | null> {
-    throw new Error('Method not implemented.')
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findById(id: string): Promise<Question | null> {
+    const question = await this.prisma.question.findUnique({
+      where: { id },
+    })
+
+    if (!question) {
+      return null
+    }
+
+    return PrismaQuestionMapper.toDomain(question)
   }
 
   findBySlug(slug: string): Promise<Question | null> {
