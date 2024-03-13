@@ -1,5 +1,6 @@
 import { Either, error, success } from '@/core/either'
 
+import { Injectable } from '@nestjs/common'
 import { NotAllowedError } from '@/core/errors/not-allowed.error'
 import { Question } from '../../enterprise/entities/question'
 import { QuestionAttachment } from '../../enterprise/entities/question-attachment'
@@ -24,6 +25,7 @@ type EditQuestionUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class EditQuestionUseCase {
   constructor(
     private questionRepository: QuestionRepository,
