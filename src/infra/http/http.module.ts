@@ -37,9 +37,12 @@ import { GetQuestionBySlugController } from './controllers/get-question-by-slug.
 import { GetQuestionBySlugUseCase } from '@/domain/forum/application/use-cases/get-question-by-slug'
 import { Module } from '@nestjs/common'
 import { RegisterStudentUseCase } from '@/domain/forum/application/use-cases/register-student'
+import { StorageModule } from '../storage/storage.module'
+import { UploadAndCreateAttachmentUseCase } from '@/domain/forum/application/use-cases/upload-and-create-attachment'
+import { UploadAttachmentController } from './controllers/upload-attachment.controller'
 
 @Module({
-  imports: [DatabaseModule, CryptographyModule],
+  imports: [DatabaseModule, CryptographyModule, StorageModule],
   controllers: [
     CreateAccountController,
     AuthenticateController,
@@ -59,6 +62,7 @@ import { RegisterStudentUseCase } from '@/domain/forum/application/use-cases/reg
     DeleteAnswerCommentController,
     FetchQuestionCommentsController,
     FetchAnswerCommentsController,
+    UploadAttachmentController,
   ],
   providers: [
     CreateQuestionUseCase,
@@ -79,6 +83,7 @@ import { RegisterStudentUseCase } from '@/domain/forum/application/use-cases/reg
     DeleteAnswerCommentUseCase,
     FetchQuestionCommentsUseCase,
     FetchAnswerCommentsUseCase,
+    UploadAndCreateAttachmentUseCase,
   ],
 })
 export class HttModule {}
