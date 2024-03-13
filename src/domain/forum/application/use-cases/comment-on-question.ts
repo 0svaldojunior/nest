@@ -1,5 +1,6 @@
 import { Either, error, success } from '@/core/either'
 
+import { Injectable } from '@nestjs/common'
 import { QuestionComment } from '../../enterprise/entities/question-comments'
 import { QuestionCommentsRepository } from '../repositories/question-comments-repository'
 import { QuestionRepository } from '../repositories/question-repository'
@@ -19,6 +20,7 @@ type CommentOnQuestionUseCaseResponse = Either<
   }
 >
 
+@Injectable()
 export class CommentOnQuestionUseCase {
   constructor(
     private questionRepository: QuestionRepository,
