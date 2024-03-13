@@ -3,11 +3,15 @@ import { PaginationParams } from '@/core/repositories/pagination-params'
 import { PrismaQuestionMapper } from '../mappers/prisma-question-mapper'
 import { PrismaService } from '../prisma.service'
 import { Question } from '@/domain/forum/enterprise/entities/question'
+import { QuestionAttachmentsRepository } from '@/domain/forum/application/repositories/question-attachments-repository'
 import { QuestionRepository } from '@/domain/forum/application/repositories/question-repository'
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private questionAttachmentsRepository: QuestionAttachmentsRepository,
+  ) {}
 
   async findById(id: string): Promise<Question | null> {
     const question = await this.prisma.question.findUnique({
@@ -48,15 +52,27 @@ export class PrismaQuestionsRepository implements QuestionRepository {
     const data = PrismaQuestionMapper.toPersistence(question)
 
     await this.prisma.question.create({ data })
+
+    await this.questionAttachmentsRepository.createMany(
+      question.attachments.getItems(),
+    )
   }
 
   async save(question: Question): Promise<void> {
     const data = PrismaQuestionMapper.toPersistence(question)
 
-    await this.prisma.question.update({
-      where: { id: data.id },
-      data,
-    })
+    await Promise.all([
+      this.prisma.question.update({
+        where: { id: data.id },
+        data,
+      }),
+      this.questionAttachmentsRepository.createMany(
+        question.attachments.getNewItems(),
+      ),
+      this.questionAttachmentsRepository.deleteMany(
+        question.attachments.getRemovedItems(),
+      ),
+    ])
   }
 
   async delete(question: Question): Promise<void> {
