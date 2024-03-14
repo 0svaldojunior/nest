@@ -1,5 +1,7 @@
+import { AnswerAttachmentFactory } from 'test/factories/make-answer-attachment'
 import { AnswerFactory } from 'test/factories/make-answer'
 import { AppModule } from '@/infra/app.module'
+import { AttachmentFactory } from 'test/factories/make-attachments'
 import { DatabaseModule } from '@/infra/database/database.module'
 import { INestApplication } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
@@ -7,6 +9,7 @@ import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { QuestionFactory } from 'test/factories/make-question'
 import { StudentFactory } from 'test/factories/make-student'
 import { Test } from '@nestjs/testing'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import request from 'supertest'
 
 describe('Edit answer (e2e)', () => {
@@ -14,13 +17,21 @@ describe('Edit answer (e2e)', () => {
   let studentFactory: StudentFactory
   let questionFactory: QuestionFactory
   let answerFactory: AnswerFactory
+  let attachmentFactory: AttachmentFactory
+  let answerAttachmentFactory: AnswerAttachmentFactory
   let prisma: PrismaService
   let jwt: JwtService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, DatabaseModule],
-      providers: [StudentFactory, QuestionFactory, AnswerFactory],
+      providers: [
+        StudentFactory,
+        QuestionFactory,
+        AnswerFactory,
+        AttachmentFactory,
+        AnswerAttachmentFactory,
+      ],
     }).compile()
 
     app = moduleRef.createNestApplication()
@@ -29,6 +40,8 @@ describe('Edit answer (e2e)', () => {
     studentFactory = moduleRef.get(StudentFactory)
     questionFactory = moduleRef.get(QuestionFactory)
     answerFactory = moduleRef.get(AnswerFactory)
+    attachmentFactory = moduleRef.get(AttachmentFactory)
+    answerAttachmentFactory = moduleRef.get(AnswerAttachmentFactory)
     jwt = moduleRef.get(JwtService)
 
     await app.init()
@@ -48,6 +61,9 @@ describe('Edit answer (e2e)', () => {
       authorId: user.id,
     })
 
+    const attachment1 = await attachmentFactory.makePrismaAttachment()
+    const attachment2 = await attachmentFactory.makePrismaAttachment()
+
     const answerId = answer.id.toString()
 
     const response = await request(app.getHttpServer())
@@ -55,9 +71,11 @@ describe('Edit answer (e2e)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         content: 'New answer content',
+        attachments: [attachment1.id.toString(), attachment2.id.toString()],
       })
 
     expect(response.statusCode).toBe(204)
+    console.log(response.body)
 
     const answerOnDatabase = await prisma.answer.findFirst({
       where: {
@@ -66,5 +84,35 @@ describe('Edit answer (e2e)', () => {
     })
 
     expect(answerOnDatabase).toBeTruthy()
+
+    if (!answerOnDatabase) {
+      return
+    }
+
+    const attachment3 = await attachmentFactory.makePrismaAttachment()
+
+    await answerAttachmentFactory.makePrismaAnswerAttachment({
+      attachmentId: attachment1.id,
+      answerId: new UniqueEntityID(answerOnDatabase.id),
+    })
+
+    await answerAttachmentFactory.makePrismaAnswerAttachment({
+      attachmentId: attachment3.id,
+      answerId: new UniqueEntityID(answerOnDatabase.id),
+    })
+
+    const attachmentsOnDatabase = await prisma.attachment.findMany({
+      where: {
+        answerId: answerOnDatabase?.id,
+      },
+    })
+
+    expect(attachmentsOnDatabase).toHaveLength(2)
+    expect(attachmentsOnDatabase).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: attachment1.id.toString() }),
+        expect.objectContaining({ id: attachment3.id.toString() }),
+      ]),
+    )
   })
 })
