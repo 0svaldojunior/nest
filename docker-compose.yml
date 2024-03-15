@@ -10,3 +10,9 @@ services:
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_PASSWORD=docker
       - POSTGRESQL_DATABASE=nest
+
+  cache:
+    container_name: nest-redis
+    image: redis
+    ports:
+      - 6379:6379
