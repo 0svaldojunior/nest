@@ -31,8 +31,9 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "title": "New question 4",
-  "content": "This is a new question"
+  "title": "New question",
+  "content": "This is a new question",
+  "attachmentsIds": []
 }
 
 ###
